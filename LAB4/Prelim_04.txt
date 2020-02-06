@@ -1,0 +1,67 @@
+00: 0x20020005 = addi $v0, $0, 0x0005
+04: 0x2003000c  = addi $v1, $0, 0x000C
+08: 0x2067fff7    = addi $a3, $v1, 0xFFF7
+0c: 0x00e22025   = or $a0, $a3, $v0
+10: 0x00642824   = and $a1, $v1, $a0
+14: 0x00a42820   = add $a1, $a1, $a0
+18: 0x10a7000a   = beq $a1, $a3, 0x000A
+1c: 0x0064202a   = slt $a0, $v1, $a0
+20: 0x10800001  = beq $a0 $zero 0x0001 
+24: 0x20050000  = addi $a1, $0, 0x0000
+28: 0x00e2202a  = slt $a0, $a3, $v0
+2c: 0x00853820  = add $a3, $a0, $a1
+30: 0x00e23822  = sub $a3, $a3, $v0
+34: 0xac670044  = sw $a3, 68($v1)
+38: 0x8c020050  = lw $v0, 80($0)
+3c: 0x08000011  = j 44
+40: 0x20020001  = addi $v0, $0, 1
+44: 0xac020054  = sw $v0, 84($0)
+48: 0x08000012  = j 48
+
+
+BLE -->
+	IM[PC]	
+	if(R[rs]<=R[rt]) 
+		PC   PC + 4+(SignImm<<2)
+	else
+		PC   PC + 4
+
+Push -->
+	IM[PC]	
+DM[R[rs] - 4] R[rt]		
+R[rs]  R[rs] – 4			
+PC  PC + 4	
+
+#################################
+#					 	#
+#		text segment		#
+#						#
+#################################
+.text		
+.globl __start 	
+_start:
+addi $v0, $0, 0x0005
+addi $v1, $0, 0x000C
+addi $a3, $v1, 0xFFF7
+or $a0, $a3, $v0
+and $a1, $v1, $a0
+add $a1, $a1, $a0
+beq $a1, $a3, 0x000A
+slt $a0, $v1, $a0
+beq $a0 $zero skip
+addi $a1, $0, 0x0000
+skip:
+slt $a0, $a3, $v0
+add $a3, $a0, $a1
+sub $a3, $a3, $v0
+sw $a3, 68($v1)
+lw $v0, 80($0)
+j A
+addi $v0, $0, 1
+A:
+sw $v0, 84($0)
+addi $sp,$0,0x0008
+push $v1     //my instruction to put v1 to stack
+ble $0,$0,B //my instruction to branch if equal or less
+B: 
+j B
